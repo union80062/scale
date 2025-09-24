@@ -212,24 +212,24 @@ function addToPlate(plateId, type, count, mass) {
       group.setAttribute("transform", `translate(${cursor.x - (plateId === "leftPlate" ? 150 : 450)}, ${cursor.y - 170})`);
     }
 
-    function endDrag(e) {
-      if (!isDragging) return;
-      isDragging = false;
-      const cursor = getCursor(e);
+function endDrag(e) {
+  if (!isDragging) return;
+  isDragging = false;
+  const cursor = getCursor(e);
 
-      const isOutside = cursor.y < 120 || cursor.y > 280 || cursor.x < 50 || cursor.x > 550;
+  const isOutside = cursor.y < 120 || cursor.y > 280 || cursor.x < 50 || cursor.x > 550;
 
-      if (isOutside) {
-        group.remove();
-        if (plateId === "leftPlate") {
-          leftMass -= mass;
-        } else {
-          rightMass -= mass;
-        }
-      } else {
-        group.setAttribute("transform", `translate(${cx}, 0)`);
-      }
+  if (isOutside) {
+    group.remove();
+    if (plateId === "leftPlate") {
+      leftMass -= mass;
+    } else {
+      rightMass -= mass;
     }
+  } else {
+    group.setAttribute("transform", `translate(${cx}, 0)`);
+  }
+}
 
     group.addEventListener("mousedown", startDrag);
     group.addEventListener("touchstart", startDrag);
@@ -279,3 +279,4 @@ updatePhysics();
  </script>
 </body>
 </html>
+
