@@ -4,67 +4,67 @@
   <meta charset="UTF-8" />
   <title>１次方程式</title>
   <style>
-body {
-  background: #f8f8f8;
-  font-family: sans-serif;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-}
-.weights {
-  margin: 20px;
-}
-.weight {
-  display: inline-block;
-  margin: 10px;
-  cursor: grab;
-  text-align: center;
-}
-.sugar {
-  background: #fff;
-  border: 1px solid #ccc;
-  margin-bottom: 8px;
-}
-.sugar[data-mass="6"] {
-  width: 30px;
-  height: 30px;
-}
-.sugar[data-mass="20"] {
-  width: 36px;
-  height: 36px;
-}
-.big {
-  width: 40px;
-  height: 40px;
-  background: #333;
-  border-radius: 50%;
-  margin-bottom: 8px;
-}
-.small {
-  width: 20px;
-  height: 20px;
-  background: #666;
-  border-radius: 50%;
-  margin-bottom: 8px;
-}
-.label {
-  font-size: 12px;
-  color: #333;
-  margin-top: 10px;
-  display: block;
-}
-.sugar-label {
-  display: none;
-}
-svg {
-  width: 600px;
-  height: 400px;
-}
-button {
-  margin: 10px;
-  padding: 8px 16px;
-  font-size: 16px;
-}
+    body {
+      background: #f8f8f8;
+      font-family: sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    .weights {
+      margin: 20px;
+    }
+    .weight {
+      display: inline-block;
+      margin: 10px;
+      cursor: grab;
+      text-align: center;
+    }
+    .sugar {
+      background: #fff;
+      border: 1px solid #ccc;
+      margin-bottom: 8px;
+    }
+    .sugar[data-mass="6"] {
+      width: 30px;
+      height: 30px;
+    }
+    .sugar[data-mass="20"] {
+      width: 36px;
+      height: 36px;
+    }
+    .big {
+      width: 40px;
+      height: 40px;
+      background: #333;
+      border-radius: 50%;
+      margin-bottom: 8px;
+    }
+    .small {
+      width: 20px;
+      height: 20px;
+      background: #666;
+      border-radius: 50%;
+      margin-bottom: 8px;
+    }
+    .label {
+      font-size: 12px;
+      color: #333;
+      margin-top: 10px;
+      display: block;
+    }
+    .sugar-label {
+      display: none;
+    }
+    svg {
+      width: 600px;
+      height: 400px;
+    }
+    button {
+      margin: 10px;
+      padding: 8px 16px;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
@@ -117,166 +117,170 @@ button {
   </svg>
 
   <script>
-let leftMass = 0, rightMass = 0, angle = 0, velocity = 0;
-let leftCount = 0, rightCount = 0;
-let sugarLabelsVisible = false;
+    let leftMass = 0, rightMass = 0, angle = 0, velocity = 0;
+    let leftCount = 0, rightCount = 0;
+    let sugarLabelsVisible = false;
 
-function toggleSugarLabels() {
-  sugarLabelsVisible = !sugarLabelsVisible;
-  document.querySelectorAll('.sugar-label').forEach(label => {
-    label.style.display = sugarLabelsVisible ? 'block' : 'none';
-  });
-  document.getElementById('toggleButton').textContent =
-    sugarLabelsVisible ? '角砂糖の重さを非表示' : '角砂糖の重さを表示';
-}
-
-document.querySelectorAll('.weight').forEach(el => {
-  el.addEventListener('dragstart', e => {
-    e.dataTransfer.setData('mass', e.target.dataset.mass);
-    e.dataTransfer.setData('type', e.target.dataset.type);
-  });
-});
-
-const svg = document.querySelector("svg");
-
-svg.addEventListener("dragover", e => e.preventDefault());
-
-svg.addEventListener("drop", e => {
-  const pt = svg.createSVGPoint();
-  pt.x = e.clientX;
-  pt.y = e.clientY;
-  const cursor = pt.matrixTransform(svg.getScreenCTM().inverse());
-
-  const mass = parseFloat(e.dataTransfer.getData("mass"));
-  const type = e.dataTransfer.getData("type");
-
-  const side = cursor.x < 300 ? "left" : "right";
-  if (side === "left") {
-    leftMass += mass;
-    addToPlate("leftPlate", type, leftCount++, mass);
-  } else {
-    rightMass += mass;
-    addToPlate("rightPlate", type, rightCount++, mass);
-  }
-
-  updatePhysics();
-});
-
-function addToPlate(plateId, type, count, mass) {
-  const plate = document.getElementById(plateId);
-  const cx = count * 24 - 36;
-
-  const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-  group.setAttribute("transform", `translate(${cx}, 0)`);
-  plate.appendChild(group);
-
-  let shape;
-  if (type === "sugar") {
-    const size = mass === 6 ? 30 : 36;
-    shape = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    shape.setAttribute("width", size);
-    shape.setAttribute("height", size);
-    shape.setAttribute("rx", 6);
-    shape.setAttribute("fill", "#fff");
-    shape.setAttribute("stroke", "#ccc");
-    shape.setAttribute("x", -size / 2);
-    shape.setAttribute("y", -35);
-  } else {
-    shape = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    shape.setAttribute("r", type === "big" ? 20 : 10);
-    shape.setAttribute("fill", type === "big" ? "#333" : "#666");
-    shape.setAttribute("cx", 0);
-    shape.setAttribute("cy", -20);
-  }
-
-  group.appendChild(shape);
-
-  // タッチ＆マウス対応ドラッグ削除
-  let isDragging = false;
-
-  function getCursor(e) {
-    const pt = svg.createSVGPoint();
-    pt.x = e.touches ? e.touches[0].clientX : e.clientX;
-    pt.y = e.touches ? e.touches[0].clientY : e.clientY;
-    return pt.matrixTransform(svg.getScreenCTM().inverse());
-  }
-
-  function startDrag(e) {
-    isDragging = true;
-    e.preventDefault();
-  }
-
-  function dragMove(e) {
-    if (!isDragging) return;
-    const cursor = getCursor(e);
-      group.setAttribute("transform", `translate(${cursor.x - (plateId === "leftPlate" ? 150 : 450)}, ${cursor.y - 170})`);
+    function toggleSugarLabels() {
+      sugarLabelsVisible = !sugarLabelsVisible;
+      document.querySelectorAll('.sugar-label').forEach(label => {
+        label.style.display = sugarLabelsVisible ? 'block' : 'none';
+      });
+      document.getElementById('toggleButton').textContent =
+        sugarLabelsVisible ? '角砂糖の重さを非表示' : '角砂糖の重さを表示';
     }
 
-function endDrag(e) {
-  if (!isDragging) return;
-  isDragging = false;
-  const cursor = getCursor(e);
+    document.querySelectorAll('.weight').forEach(el => {
+      el.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('mass', e.target.dataset.mass);
+        e.dataTransfer.setData('type', e.target.dataset.type);
+      });
+    });
 
-  const isOutside = cursor.y < 120 || cursor.y > 280 || cursor.x < 50 || cursor.x > 550;
+    const svg = document.querySelector("svg");
 
-  if (isOutside) {
-    group.remove();
-    if (plateId === "leftPlate") {
-      leftMass -= mass;
-    } else {
-      rightMass -= mass;
+    svg.addEventListener("dragover", e => e.preventDefault());
+
+    svg.addEventListener("drop", e => {
+      const pt = svg.createSVGPoint();
+      pt.x = e.clientX;
+      pt.y = e.clientY;
+      const cursor = pt.matrixTransform(svg.getScreenCTM().inverse());
+
+      const mass = parseFloat(e.dataTransfer.getData("mass"));
+      const type = e.dataTransfer.getData("type");
+
+      const side = cursor.x < 300 ? "left" : "right";
+      if (side === "left") {
+        leftMass += mass;
+        addToPlate("leftPlate", type, leftCount++, mass);
+      } else {
+        rightMass += mass;
+        addToPlate("rightPlate", type, rightCount++, mass);
+      }
+
+      updatePhysics();
+    });
+
+    function addToPlate(plateId, type, count, mass) {
+      const plate = document.getElementById(plateId);
+      const cx = count * 24 - 36;
+
+      const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      group.setAttribute("transform", `translate(${cx}, 0)`);
+      plate.appendChild(group);
+
+      let shape;
+      if (type === "sugar") {
+        const size = mass === 6 ? 30 : 36;
+        shape = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        shape.setAttribute("width", size);
+        shape.setAttribute("height", size);
+        shape.setAttribute("rx", 6);
+        shape.setAttribute("fill", "#fff");
+        shape.setAttribute("stroke", "#ccc");
+        shape.setAttribute("x", -size / 2);
+        shape.setAttribute("y", -35);
+      } else {
+        shape = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        shape.setAttribute("r", type === "big" ? 20 : 10);
+        shape.setAttribute("fill", type === "big" ? "#333" : "#666");
+        shape.setAttribute("cx", 0);
+        shape.setAttribute("cy", -20);
+      }
+
+      group.appendChild(shape);
+
+      let isDragging = false;
+      let massRemoved = false;
+
+      function getCursor(e) {
+        const pt = svg.createSVGPoint();
+        pt.x = e.touches ? e.touches[0].clientX : e.clientX;
+        pt.y = e.touches ? e.touches[0].clientY : e.clientY;
+        return pt.matrixTransform(svg.getScreenCTM().inverse());
+      }
+
+      function startDrag(e) {
+        isDragging = true;
+        e.preventDefault();
+      }
+
+      function dragMove(e) {
+        if (!isDragging) return;
+        const cursor = getCursor(e);
+        group.setAttribute("transform", `translate(${cursor.x - (plateId === "leftPlate" ? 150 : 450)}, ${cursor.y - 170})`);
+
+        const isOutside = cursor.y < 120 || cursor.y > 280 || cursor.x < 50 || cursor.x > 550;
+
+        if (isOutside && !massRemoved) {
+          massRemoved = true;
+          if (plateId === "leftPlate") leftMass -= mass;
+          else rightMass -= mass;
+        }
+
+        if (!isOutside && massRemoved) {
+          massRemoved = false;
+          if (plateId === "leftPlate") leftMass += mass;
+          else rightMass += mass;
+        }
+      }
+
+      function endDrag(e) {
+        isDragging = false;
+        const cursor = getCursor(e);
+        const isOutside = cursor.y < 120 || cursor.y > 280 || cursor.x < 50 || cursor.x > 550;
+        if (isOutside) {
+          group.remove();
+        } else {
+          group.setAttribute("transform", `translate(${cx}, 0)`);
+        }
+      }
+
+      group.addEventListener("mousedown", startDrag);
+      group.addEventListener("touchstart", startDrag);
+      svg.addEventListener("mousemove", dragMove);
+      svg.addEventListener("touchmove", dragMove, { passive: false });
+      svg.addEventListener("mouseup", endDrag);
+      svg.addEventListener("touchend", endDrag);
     }
-  } else {
-    group.setAttribute("transform", `translate(${cx}, 0)`);
-  }
-}
 
-    group.addEventListener("mousedown", startDrag);
-    group.addEventListener("touchstart", startDrag);
-    svg.addEventListener("mousemove", dragMove);
-    svg.addEventListener("touchmove", dragMove, { passive: false });
-    svg.addEventListener("mouseup", endDrag);
-    svg.addEventListener("touchend", endDrag);
-}
+    function resetScale() {
+      leftMass = 0;
+      rightMass = 0;
+      angle = 0;
+      velocity = 0;
+      leftCount = 0;
+      rightCount = 0;
+      document.getElementById("leftPlate").innerHTML = '<ellipse cx="0" cy="0" rx="70" ry="18" fill="url(#plate)" />';
+      document.getElementById("rightPlate").innerHTML = '<ellipse cx="0" cy="0" rx="70" ry="18" fill="url(#plate)" />';
+    }
 
-function resetScale() {
-  leftMass = 0;
-  rightMass = 0;
-  angle = 0;
-  velocity = 0;
-  leftCount = 0;
-  rightCount = 0;
-  document.getElementById("leftPlate").innerHTML = '<ellipse cx="0" cy="0" rx="70" ry="18" fill="#aaa" />';
-  document.getElementById("rightPlate").innerHTML = '<ellipse cx="0" cy="0" rx="70" ry="18" fill="#aaa" />';
-}
+    function updatePhysics() {
+      const force = (leftMass - rightMass) * 0.05;
+      const damping = 0.05;
+      velocity += force - velocity * damping;
+      angle += -velocity;
 
-function updatePhysics() {
-  const force = (leftMass - rightMass) * 0.05;
-  const damping = 0.05;
-  velocity += force - velocity * damping;
-  angle += -velocity;
+      if (Math.abs(force) < 0.005 && Math.abs(velocity) < 0.01) {
+        velocity = 0;
+        angle *= 0.985;
+        if (Math.abs(angle) < 0.1) angle = 0;
+      }
 
-  if (Math.abs(force) < 0.005 && Math.abs(velocity) < 0.01) {
-    velocity = 0;
-    angle *= 0.985;
-    if (Math.abs(angle) < 0.1) angle = 0;
-  }
+      angle = Math.max(Math.min(angle, 25), -25);
 
-  angle = Math.max(Math.min(angle, 25), -25);
+      document.getElementById("scaleGroup").setAttribute("transform", `rotate(${angle},300,200)`);
 
-  document.getElementById("scaleGroup").setAttribute("transform", `rotate(${angle},300,200)`);
+      const leftY = 170 + angle;
+      const rightY = 170 - angle;
+      document.getElementById("leftPlate").setAttribute("transform", `translate(150,${leftY})`);
+      document.getElementById("rightPlate").setAttribute("transform", `translate(450,${rightY})`);
 
-  const leftY = 170 + angle;
-  const rightY = 170 - angle;
-  document.getElementById("leftPlate").setAttribute("transform", `translate(150,${leftY})`);
-  document.getElementById("rightPlate").setAttribute("transform", `translate(450,${rightY})`);
+      requestAnimationFrame(updatePhysics);
+    }
 
-  requestAnimationFrame(updatePhysics);
-}
-
-updatePhysics();
-
- </script>
+    updatePhysics();
+  </script>
 </body>
 </html>
-
