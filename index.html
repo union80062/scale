@@ -2,151 +2,165 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>てんびん完全版</title>
+  <title>１次方程式</title>
   <style>
-    body {
-      background: #f8f8f8;
-      font-family: sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-    }
-    .weights {
-      margin: 20px;
-    }
-    .weight {
-      display: inline-block;
-      margin: 10px;
-      cursor: grab;
-      text-align: center;
-    }
-    .sugar {
-      background: #fff;
-      border: 1px solid #ccc;
-      margin-bottom: 8px;
-    }
-    .sugar[data-mass="6"] {
-      width: 30px;
-      height: 30px;
-    }
-    .sugar[data-mass="20"] {
-      width: 36px;
-      height: 36px;
-    }
-    .big {
-      width: 40px;
-      height: 40px;
-      background: #333;
-      border-radius: 50%;
-      margin-bottom: 8px;
-    }
-    .small {
-      width: 20px;
-      height: 20px;
-      background: #666;
-      border-radius: 50%;
-      margin-bottom: 8px;
-    }
-    .label {
-      font-size: 12px;
-      color: #333;
-      margin-top: 10px;
-      display: block;
-    }
-    .sugar-label {
-      display: none;
-    }
-    svg {
-      width: 600px;
-      height: 400px;
-    }
-    button {
-      margin: 10px;
-      padding: 8px 16px;
-      font-size: 16px;
-    }
+body {
+  background: #f8f8f8;
+  font-family: sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+.weights {
+  margin: 20px;
+}
+.weight {
+  display: inline-block;
+  margin: 10px;
+  cursor: grab;
+  text-align: center;
+}
+.sugar {
+  background: #fff;
+  border: 1px solid #ccc;
+  margin-bottom: 8px;
+}
+.sugar[data-mass="6"] {
+  width: 30px;
+  height: 30px;
+}
+.sugar[data-mass="20"] {
+  width: 36px;
+  height: 36px;
+}
+.big {
+  width: 40px;
+  height: 40px;
+  background: #333;
+  border-radius: 50%;
+  margin-bottom: 8px;
+}
+.small {
+  width: 20px;
+  height: 20px;
+  background: #666;
+  border-radius: 50%;
+  margin-bottom: 8px;
+}
+.label {
+  font-size: 12px;
+  color: #333;
+  margin-top: 10px;
+  display: block;
+}
+.sugar-label {
+  display: none;
+}
+svg {
+  width: 600px;
+  height: 400px;
+}
+button {
+  margin: 10px;
+  padding: 8px 16px;
+  font-size: 16px;
+}
   </style>
 </head>
 <body>
   <h1>⚖️ 上皿てんびん</h1>
 
-<div class="weights">
-  <div class="weight" draggable="true" data-mass="6" data-type="sugar">
-    <div class="sugar" data-mass="6"></div>
-    <div class="label sugar-label">6g</div>
+  <div class="weights">
+    <div class="weight" draggable="true" data-mass="6" data-type="sugar">
+      <div class="sugar" data-mass="6"></div>
+      <div class="label sugar-label">6g</div>
+    </div>
+    <div class="weight" draggable="true" data-mass="20" data-type="sugar">
+      <div class="sugar" data-mass="20"></div>
+      <div class="label sugar-label">20g</div>
+    </div>
+    <div class="weight" draggable="true" data-mass="20" data-type="big">
+      <div class="big"></div>
+      <div class="label">20g</div>
+    </div>
+    <div class="weight" draggable="true" data-mass="2" data-type="small">
+      <div class="small"></div>
+      <div class="label">2g</div>
+    </div>
   </div>
-  <div class="weight" draggable="true" data-mass="20" data-type="sugar">
-    <div class="sugar" data-mass="20"></div>
-    <div class="label sugar-label">20g</div>
-  </div>
-  <div class="weight" draggable="true" data-mass="20" data-type="big">
-    <div class="big"></div>
-    <div class="label">20g</div>
-  </div>
-  <div class="weight" draggable="true" data-mass="2" data-type="small">
-    <div class="small"></div>
-    <div class="label">2g</div>
-  </div>
-</div>
 
-<button onclick="toggleSugarLabels()" id="toggleButton">角砂糖の重さを表示</button>
-<button onclick="resetScale()">リセット</button>
+  <button onclick="toggleSugarLabels()" id="toggleButton">角砂糖の重さを表示</button>
+  <button onclick="resetScale()">リセット</button>
 
   <svg viewBox="0 0 600 400">
-    <rect x="295" y="200" width="10" height="120" fill="#444" />
+    <defs>
+      <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#999" />
+        <stop offset="100%" stop-color="#ccc" />
+      </linearGradient>
+      <radialGradient id="plate" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#ddd" />
+        <stop offset="100%" stop-color="#aaa" />
+      </radialGradient>
+    </defs>
+    <rect x="295" y="200" width="10" height="120" fill="url(#metal)" />
     <g id="scaleGroup">
-      <line x1="150" y1="200" x2="450" y2="200" stroke="#333" stroke-width="10" />
+      <line x1="150" y1="200" x2="450" y2="200" stroke="#999" stroke-width="8" stroke-linecap="round" />
       <circle cx="300" cy="200" r="14" fill="#666" />
       <g id="leftPlate" transform="translate(150,170)">
-        <ellipse cx="0" cy="0" rx="70" ry="18" fill="#aaa" />
+        <ellipse cx="0" cy="0" rx="70" ry="18" fill="url(#plate)" />
       </g>
       <g id="rightPlate" transform="translate(450,170)">
-        <ellipse cx="0" cy="0" rx="70" ry="18" fill="#aaa" />
+        <ellipse cx="0" cy="0" rx="70" ry="18" fill="url(#plate)" />
       </g>
     </g>
   </svg>
 
   <script>
-    let leftMass = 0, rightMass = 0, angle = 0, velocity = 0;
-    let leftCount = 0, rightCount = 0;
+let leftMass = 0, rightMass = 0, angle = 0, velocity = 0;
+let leftCount = 0, rightCount = 0;
+let sugarLabelsVisible = false;
 
-    function toggleSugarLabels() {
-      document.querySelectorAll('.sugar-label').forEach(label => {
-        label.style.display = 'block';
-      });
-    }
+function toggleSugarLabels() {
+  sugarLabelsVisible = !sugarLabelsVisible;
+  document.querySelectorAll('.sugar-label').forEach(label => {
+    label.style.display = sugarLabelsVisible ? 'block' : 'none';
+  });
+  document.getElementById('toggleButton').textContent =
+    sugarLabelsVisible ? '角砂糖の重さを非表示' : '角砂糖の重さを表示';
+}
 
-    document.querySelectorAll('.weight').forEach(el => {
-      el.addEventListener('dragstart', e => {
-        e.dataTransfer.setData('mass', e.target.dataset.mass);
-        e.dataTransfer.setData('type', e.target.dataset.type);
-      });
-    });
+document.querySelectorAll('.weight').forEach(el => {
+  el.addEventListener('dragstart', e => {
+    e.dataTransfer.setData('mass', e.target.dataset.mass);
+    e.dataTransfer.setData('type', e.target.dataset.type);
+  });
+});
 
-    const svg = document.querySelector("svg");
+const svg = document.querySelector("svg");
 
-    svg.addEventListener("dragover", e => e.preventDefault());
+svg.addEventListener("dragover", e => e.preventDefault());
 
-    svg.addEventListener("drop", e => {
-      const pt = svg.createSVGPoint();
-      pt.x = e.clientX;
-      pt.y = e.clientY;
-      const cursor = pt.matrixTransform(svg.getScreenCTM().inverse());
+svg.addEventListener("drop", e => {
+  const pt = svg.createSVGPoint();
+  pt.x = e.clientX;
+  pt.y = e.clientY;
+  const cursor = pt.matrixTransform(svg.getScreenCTM().inverse());
 
-      const mass = parseFloat(e.dataTransfer.getData("mass"));
-      const type = e.dataTransfer.getData("type");
+  const mass = parseFloat(e.dataTransfer.getData("mass"));
+  const type = e.dataTransfer.getData("type");
 
-      const side = cursor.x < 300 ? "left" : "right";
-      if (side === "left") {
-        leftMass += mass;
-        addToPlate("leftPlate", type, leftCount++, mass);
-      } else {
-        rightMass += mass;
-        addToPlate("rightPlate", type, rightCount++, mass);
-      }
+  const side = cursor.x < 300 ? "left" : "right";
+  if (side === "left") {
+    leftMass += mass;
+    addToPlate("leftPlate", type, leftCount++, mass);
+  } else {
+    rightMass += mass;
+    addToPlate("rightPlate", type, rightCount++, mass);
+  }
 
-      updatePhysics(); // 即時反応
-    });
+  updatePhysics();
+});
 
 function addToPlate(plateId, type, count, mass) {
   const plate = document.getElementById(plateId);
@@ -154,6 +168,7 @@ function addToPlate(plateId, type, count, mass) {
 
   const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
   group.setAttribute("transform", `translate(${cx}, 0)`);
+  plate.appendChild(group);
 
   let shape;
   if (type === "sugar") {
@@ -175,94 +190,92 @@ function addToPlate(plateId, type, count, mass) {
   }
 
   group.appendChild(shape);
-  plate.appendChild(group);
 
-  // 削除用ドラッグ処理
+  // タッチ＆マウス対応ドラッグ削除
   let isDragging = false;
 
-group.addEventListener("mousedown", e => {
-  isDragging = true;
-  e.preventDefault();
-});
-
-svg.addEventListener("mousemove", e => {
-  if (!isDragging) return;
-  const pt = svg.createSVGPoint();
-  pt.x = e.clientX;
-  pt.y = e.clientY;
-  const cursor = pt.matrixTransform(svg.getScreenCTM().inverse());
-  group.setAttribute("transform", `translate(${cursor.x - (plateId === "leftPlate" ? 150 : 450)}, ${cursor.y - 170})`);
-});
-
-svg.addEventListener("mouseup", e => {
-  if (!isDragging) return;
-  isDragging = false;
-  const pt = svg.createSVGPoint();
-  pt.x = e.clientX;
-  pt.y = e.clientY;
-  const cursor = pt.matrixTransform(svg.getScreenCTM().inverse());
-
-  const isOutside = cursor.y < 120 || cursor.y > 280 || cursor.x < 50 || cursor.x > 550;
-
-  if (isOutside) {
-    group.remove();
-    if (plateId === "leftPlate") {
-      leftMass -= mass;
-    } else {
-      rightMass -= mass;
-    }
-  } else {
-    group.setAttribute("transform", `translate(${cx}, 0)`);
+  function getCursor(e) {
+    const pt = svg.createSVGPoint();
+    pt.x = e.touches ? e.touches[0].clientX : e.clientX;
+    pt.y = e.touches ? e.touches[0].clientY : e.clientY;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
   }
-});}
-    function resetScale() {
-      leftMass = 0;
-      rightMass = 0;
-      angle = 0;
-      velocity = 0;
-      leftCount = 0;
-      rightCount = 0;
-      document.getElementById("leftPlate").innerHTML = '<ellipse cx="0" cy="0" rx="70" ry="18" fill="#aaa" />';
-      document.getElementById("rightPlate").innerHTML = '<ellipse cx="0" cy="0" rx="70" ry="18" fill="#aaa" />';
+
+  function startDrag(e) {
+    isDragging = true;
+    e.preventDefault();
+  }
+
+  function dragMove(e) {
+    if (!isDragging) return;
+    const cursor = getCursor(e);
+      group.setAttribute("transform", `translate(${cursor.x - (plateId === "leftPlate" ? 150 : 450)}, ${cursor.y - 170})`);
     }
 
-    function updatePhysics() {
-      const force = (leftMass - rightMass) * 0.05;
-      const damping = 0.05;
-      velocity += force - velocity * damping;
-      angle += -velocity;
+    function endDrag(e) {
+      if (!isDragging) return;
+      isDragging = false;
+      const cursor = getCursor(e);
 
-      if (Math.abs(force) < 0.005 && Math.abs(velocity) < 0.01) {
-        velocity = 0;
-        angle *= 0.985;
-        if (Math.abs(angle) < 0.1) angle = 0;
+      const isOutside = cursor.y < 120 || cursor.y > 280 || cursor.x < 50 || cursor.x > 550;
+
+      if (isOutside) {
+        group.remove();
+        if (plateId === "leftPlate") {
+          leftMass -= mass;
+        } else {
+          rightMass -= mass;
+        }
+      } else {
+        group.setAttribute("transform", `translate(${cx}, 0)`);
       }
-
-      angle = Math.max(Math.min(angle, 25), -25);
-
-      document.getElementById("scaleGroup").setAttribute("transform", `rotate(${angle},300,200)`);
-
-      const leftY = 170 + angle;
-      const rightY = 170 - angle;
-      document.getElementById("leftPlate").setAttribute("transform", `translate(150,${leftY})`);
-      document.getElementById("rightPlate").setAttribute("transform", `translate(450,${rightY})`);
-
-      requestAnimationFrame(updatePhysics);
     }
 
-let sugarLabelsVisible = false;
-
-function toggleSugarLabels() {
-  sugarLabelsVisible = !sugarLabelsVisible;
-  document.querySelectorAll('.sugar-label').forEach(label => {
-    label.style.display = sugarLabelsVisible ? 'block' : 'none';
-  });
-  document.getElementById('toggleButton').textContent =
-    sugarLabelsVisible ? '角砂糖の重さを非表示' : '角砂糖の重さを表示';
+    group.addEventListener("mousedown", startDrag);
+    group.addEventListener("touchstart", startDrag);
+    svg.addEventListener("mousemove", dragMove);
+    svg.addEventListener("touchmove", dragMove, { passive: false });
+    svg.addEventListener("mouseup", endDrag);
+    svg.addEventListener("touchend", endDrag);
 }
 
-    updatePhysics();
-  </script>
-</body>
+function resetScale() {
+  leftMass = 0;
+  rightMass = 0;
+  angle = 0;
+  velocity = 0;
+  leftCount = 0;
+  rightCount = 0;
+  document.getElementById("leftPlate").innerHTML = '<ellipse cx="0" cy="0" rx="70" ry="18" fill="#aaa" />';
+  document.getElementById("rightPlate").innerHTML = '<ellipse cx="0" cy="0" rx="70" ry="18" fill="#aaa" />';
+}
 
+function updatePhysics() {
+  const force = (leftMass - rightMass) * 0.05;
+  const damping = 0.05;
+  velocity += force - velocity * damping;
+  angle += -velocity;
+
+  if (Math.abs(force) < 0.005 && Math.abs(velocity) < 0.01) {
+    velocity = 0;
+    angle *= 0.985;
+    if (Math.abs(angle) < 0.1) angle = 0;
+  }
+
+  angle = Math.max(Math.min(angle, 25), -25);
+
+  document.getElementById("scaleGroup").setAttribute("transform", `rotate(${angle},300,200)`);
+
+  const leftY = 170 + angle;
+  const rightY = 170 - angle;
+  document.getElementById("leftPlate").setAttribute("transform", `translate(150,${leftY})`);
+  document.getElementById("rightPlate").setAttribute("transform", `translate(450,${rightY})`);
+
+  requestAnimationFrame(updatePhysics);
+}
+
+updatePhysics();
+
+ </script>
+</body>
 </html>
