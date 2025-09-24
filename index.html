@@ -115,7 +115,6 @@
       </g>
     </g>
   </svg>
-
   <script>
     let leftMass = 0, rightMass = 0, angle = 0, velocity = 0;
     let leftCount = 0, rightCount = 0;
@@ -207,42 +206,35 @@
       }
 
       function dragMove(e) {
-        if (!isDragging) return;
+        if (!isDragging || massRemoved) return;
         const cursor = getCursor(e);
         group.setAttribute("transform", `translate(${cursor.x - (plateId === "leftPlate" ? 150 : 450)}, ${cursor.y - 170})`);
 
         const isOutside = cursor.y < 120 || cursor.y > 280 || cursor.x < 50 || cursor.x > 550;
 
-        if (isOutside && !massRemoved) {
+        if (isOutside) {
+          group.style.transition = "opacity 0.3s";
+          group.style.opacity = "0";
           massRemoved = true;
-          if (plateId === "leftPlate") leftMass -= mass;
-          else rightMass -= mass;
-        }
 
-        if (!isOutside && massRemoved) {
-          massRemoved = false;
-          if (plateId === "leftPlate") leftMass += mass;
-          else rightMass += mass;
+          setTimeout(() => {
+            group.remove();
+            if (plateId === "leftPlate") leftMass -= mass;
+            else rightMass -= mass;
+          }, 300);
         }
       }
 
-      function endDrag(e) {
+      function endDrag() {
         isDragging = false;
-        const cursor = getCursor(e);
-        const isOutside = cursor.y < 120 || cursor.y > 280 || cursor.x < 50 || cursor.x > 550;
-        if (isOutside) {
-          group.remove();
-        } else {
-          group.setAttribute("transform", `translate(${cx}, 0)`);
-        }
       }
 
       group.addEventListener("mousedown", startDrag);
       group.addEventListener("touchstart", startDrag);
-      svg.addEventListener("mousemove", dragMove);
-      svg.addEventListener("touchmove", dragMove, { passive: false });
-      svg.addEventListener("mouseup", endDrag);
-      svg.addEventListener("touchend", endDrag);
+      group.addEventListener("mousemove", dragMove);
+      group.addEventListener("touchmove", dragMove, { passive: false });
+      group.addEventListener("mouseup", endDrag);
+      group.addEventListener("touchend", endDrag);
     }
 
     function resetScale() {
